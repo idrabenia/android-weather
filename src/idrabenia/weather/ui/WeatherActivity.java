@@ -20,7 +20,7 @@ public class WeatherActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main);
+        setContentView(R.layout.wait_screen);
 
         updateWeatherTask.execute("Minsk");
     }
@@ -37,6 +37,7 @@ public class WeatherActivity extends Activity {
 
         @Override
         protected void onPostExecute(final String response) {
+            setContentView(R.layout.main);
             setCurWeather(response);
 
             List<WeatherItem> weatherItems = parser.parseWeatherItemList(response);
