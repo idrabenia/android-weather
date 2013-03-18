@@ -1,9 +1,11 @@
 package idrabenia.weather.ui;
 
 import android.content.Context;
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.drawable.Drawable;
 import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -39,7 +41,12 @@ public class WeatherItemsAdapter extends ArrayAdapter<WeatherItem> {
 
         WeatherItem curItem = this.getItem(position);
         if (curItem != null) {
-            new LoadImageTask(v).execute(curItem.imageUrl);
+            String imageName = curItem.imageUrl.replaceAll(".*\\/", "").replaceAll("\\..*", "");
+            Resources resources = getContext().getResources();
+            int imageId = resources.getIdentifier(imageName, "drawable", this.getContext().getPackageName());
+
+            getCurrentWeatherImage(v).setImageBitmap(getResizedBitmap(BitmapFactory.decodeResource(resources,
+                    imageId), 140, 140));
             setTemperature(v, curItem.minTemperature, curItem.maxTemperature);
             setItemTitle(v, curItem.date, curItem.description);
         }
@@ -69,28 +76,30 @@ public class WeatherItemsAdapter extends ArrayAdapter<WeatherItem> {
                     });
         }
 
-        public Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
-            int width = bm.getWidth();
-            int height = bm.getHeight();
-            float scaleWidth = ((float) newWidth) / width;
-            float scaleHeight = ((float) newHeight) / height;
 
-            // create a matrix for the manipulation
-            Matrix matrix = new Matrix();
-
-            // resize the bit map
-            matrix.postScale(scaleWidth, scaleHeight);
-
-            // recreate the new Bitmap
-            Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
-
-            return resizedBitmap;
-        }
 
         @Override
         protected void onPostExecute(Bitmap bitmap) {
-            getCurrentWeatherImage(view).setImageBitmap(getResizedBitmap(bitmap, 140, 140));
+            ;
         }
+    }
+
+    public Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
+        int width = bm.getWidth();
+        int height = bm.getHeight();
+        float scaleWidth = ((float) newWidth) / width;
+        float scaleHeight = ((float) newHeight) / height;
+
+        // create a matrix for the manipulation
+        Matrix matrix = new Matrix();
+
+        // resize the bit map
+        matrix.postScale(scaleWidth, scaleHeight);
+
+        // recreate the new Bitmap
+        Bitmap resizedBitmap = Bitmap.createBitmap(bm, 0, 0, width, height, matrix, false);
+
+        return resizedBitmap;
     }
 
     ImageView getCurrentWeatherImage(View v) {

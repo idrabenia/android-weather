@@ -9,7 +9,6 @@ import idrabenia.weather.R;
 import idrabenia.weather.domain.CurrentWeather;
 import idrabenia.weather.domain.WeatherItem;
 import idrabenia.weather.service.WorldWeatherService;
-import idrabenia.weather.service.converters.WeatherParser;
 
 import java.util.List;
 
@@ -26,7 +25,7 @@ public class WeatherActivity extends Activity {
     }
 
     private class UpdateWeatherTask extends AsyncTask<String, Integer, String> {
-        private final WeatherParser parser = new WeatherParser();
+        private final WorldWeatherService weatherService = new WorldWeatherService(WeatherActivity.this);
 
         @Override
         protected String doInBackground(String... params) {
@@ -40,7 +39,7 @@ public class WeatherActivity extends Activity {
             setContentView(R.layout.main);
             setCurWeather(response);
 
-            List<WeatherItem> weatherItems = parser.parseWeatherItemList(response);
+            List<WeatherItem> weatherItems = weatherService.parseWeatherItemList(response);
             findById(ListView.class, R.id.weather_items).setAdapter(new WeatherItemsAdapter(WeatherActivity.this,
                     R.layout.weather_item, weatherItems));
         }
@@ -53,7 +52,7 @@ public class WeatherActivity extends Activity {
     }
 
     private void setCurWeather(String response) {
-        CurrentWeather curWeather = new WeatherParser().parseCurrentWeather(response);
+        CurrentWeather curWeather = new WorldWeatherService(this).parseCurrentWeather(response);
         findById(TextView.class, R.id.cur_temperature).setText(Integer.toString(curWeather.temperature));
         findById(TextView.class, R.id.cur_weather_summary).setText(curWeather.summary);
         findById(TextView.class, R.id.cur_wind_direction).setText(curWeather.windDirection);
