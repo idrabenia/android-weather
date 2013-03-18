@@ -5,8 +5,6 @@ import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.graphics.drawable.Drawable;
-import android.os.AsyncTask;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -15,10 +13,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import idrabenia.weather.R;
 import idrabenia.weather.domain.WeatherItem;
-import idrabenia.weather.service.ExceptionHandlingTemplate;
 
-import java.io.InputStream;
-import java.net.URL;
 import java.util.List;
 
 /**
@@ -41,47 +36,11 @@ public class WeatherItemsAdapter extends ArrayAdapter<WeatherItem> {
 
         WeatherItem curItem = this.getItem(position);
         if (curItem != null) {
-            String imageName = curItem.imageUrl.replaceAll(".*\\/", "").replaceAll("\\..*", "");
-            Resources resources = getContext().getResources();
-            int imageId = resources.getIdentifier(imageName, "drawable", this.getContext().getPackageName());
-
-            getCurrentWeatherImage(v).setImageBitmap(getResizedBitmap(BitmapFactory.decodeResource(resources,
-                    imageId), 140, 140));
+            setWeatherImage(v, curItem.imageUrl.replaceAll(".*\\/", "").replaceAll("\\..*", ""));
             setTemperature(v, curItem.minTemperature, curItem.maxTemperature);
             setItemTitle(v, curItem.date, curItem.description);
         }
         return v;
-    }
-
-
-    private class LoadImageTask extends AsyncTask<String, Integer, Bitmap> {
-        private final View view;
-
-        private LoadImageTask(View v) {
-            view = v;
-        }
-
-        @Override
-        protected Bitmap doInBackground(String... params) {
-            final String url = params[0];
-
-            return ExceptionHandlingTemplate.executeWithExceptionHandler(
-                    new ExceptionHandlingTemplate.Action<Bitmap>() {
-                        @Override
-                        public Bitmap execute() throws Exception {
-//                            BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-//                            bmOptions.inSampleSize = 1; // 1 = 100% if you write 4 means 1/4 = 25%
-                            return BitmapFactory.decodeStream((InputStream) new URL(url).getContent());
-                        }
-                    });
-        }
-
-
-
-        @Override
-        protected void onPostExecute(Bitmap bitmap) {
-            ;
-        }
     }
 
     public Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
@@ -102,8 +61,16 @@ public class WeatherItemsAdapter extends ArrayAdapter<WeatherItem> {
         return resizedBitmap;
     }
 
-    ImageView getCurrentWeatherImage(View v) {
+    ImageView getWeatherImage(View v) {
         return (ImageView) v.findViewById(R.id.current_weather_image);
+    }
+
+    void setWeatherImage(View v, String imageName) {
+        Resources resources = getContext().getResources();
+        int imageId = resources.getIdentifier(imageName, "drawable", this.getContext().getPackageName());
+
+        getWeatherImage(v).setImageBitmap(getResizedBitmap(BitmapFactory.decodeResource(resources,
+                imageId), 140, 140));
     }
 
     TextView getItemTitleLabel(View v) {
@@ -114,12 +81,12 @@ public class WeatherItemsAdapter extends ArrayAdapter<WeatherItem> {
         getItemTitleLabel(v).setText(getContext().getString(R.string.location_label_pattern, date, description));
     }
 
-    TextView getCurTemperatureLabel(View v) {
+    TextView getTemperatureLabel(View v) {
         return (TextView) v.findViewById(R.id.temperature_label);
     }
 
     void setTemperature(View v, int minTemperature, int maxTemperature) {
         String labelText = getContext().getString(R.string.temperature_label_pattern, minTemperature, maxTemperature);
-        getCurTemperatureLabel(v).setText(labelText);
+        getTemperatureLabel(v).setText(labelText);
     }
 }
