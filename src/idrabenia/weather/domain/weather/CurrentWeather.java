@@ -1,4 +1,4 @@
-package idrabenia.weather.domain;
+package idrabenia.weather.domain.weather;
 
 /**
  * @author Ilya Drabenia

@@ -12,7 +12,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 import idrabenia.weather.R;
-import idrabenia.weather.domain.WeatherItem;
+import idrabenia.weather.domain.weather.WeatherItem;
 
 import java.util.List;
 

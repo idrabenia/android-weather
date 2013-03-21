@@ -2,8 +2,8 @@ package idrabenia.weather.service;
 
 import android.content.Context;
 import idrabenia.weather.R;
-import idrabenia.weather.domain.CurrentWeather;
-import idrabenia.weather.domain.WeatherItem;
+import idrabenia.weather.domain.weather.CurrentWeather;
+import idrabenia.weather.domain.weather.WeatherItem;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
