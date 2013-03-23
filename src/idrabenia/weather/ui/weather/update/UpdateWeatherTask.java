@@ -1,23 +1,20 @@
 package idrabenia.weather.ui.weather.update;
 
-import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.location.Location;
 import android.os.AsyncTask;
-import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.ListView;
 import idrabenia.weather.R;
-import idrabenia.weather.domain.WeatherApplicationException;
 import idrabenia.weather.domain.weather.CurrentWeather;
 import idrabenia.weather.domain.weather.WeatherItem;
 import idrabenia.weather.service.WorldWeatherClient;
 import idrabenia.weather.service.rest.NetworkException;
+import idrabenia.weather.ui.CrashDialogActivity;
 import idrabenia.weather.ui.weather.WeatherActivity;
 import idrabenia.weather.ui.weather.WeatherItemsAdapter;
 
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * @author Ilya Drabenia
@@ -52,16 +49,24 @@ public class UpdateWeatherTask extends AsyncTask<Location, Integer, UpdateResult
             activity.hideWaitingScreen();
 
             CurrentWeather curWeather = weatherClient.parseCurrentWeather(result.response);
-            activity.setCurWeather(curWeather);
+            List<WeatherItem> items = weatherClient.parseWeatherItemList(result.response);
+            activity.setWeather(curWeather, items);
 
-            List<WeatherItem> weatherItems = weatherClient.parseWeatherItemList(result.response);
-            activity.findById(ListView.class, R.id.weather_items).setAdapter(new WeatherItemsAdapter(activity,
-                    R.layout.weather_item, weatherItems));
+            scheduleRefreshWeatherTask();
         }
 
         if (result.networkException != null) {
-            activity.processCriticalError(result.networkException, R.string.network_error);
+            CrashDialogActivity.processCriticalError(activity, result.networkException, R.string.network_error);
         }
+    }
+
+    private void scheduleRefreshWeatherTask() {
+        new Timer("Update Weather Timer", true).schedule(new TimerTask() {
+            @Override
+            public void run() {
+                activity.refreshWeatherInfo();
+            }
+        }, activity.getResources().getInteger(R.integer.update_weather_delay));
     }
 
 }

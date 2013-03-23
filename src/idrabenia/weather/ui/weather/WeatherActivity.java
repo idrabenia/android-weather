@@ -3,19 +3,21 @@ package idrabenia.weather.ui.weather;
 import android.app.Activity;
 import android.content.Intent;
 import android.location.Location;
-import android.os.*;
-import android.os.Process;
-import android.util.Log;
+import android.os.Bundle;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ListView;
 import android.widget.TextView;
 import idrabenia.weather.R;
 import idrabenia.weather.domain.weather.CurrentWeather;
+import idrabenia.weather.domain.weather.WeatherItem;
 import idrabenia.weather.service.location.LocationListener;
 import idrabenia.weather.service.location.LocationService;
 import idrabenia.weather.ui.CrashDialogActivity;
 import idrabenia.weather.ui.weather.update.UpdateWeatherTask;
+
+import java.util.List;
 
 public class WeatherActivity extends Activity implements LocationListener {
 
@@ -29,7 +31,7 @@ public class WeatherActivity extends Activity implements LocationListener {
         refreshWeatherInfo();
     }
 
-    void refreshWeatherInfo() {
+    public void refreshWeatherInfo() {
         LocationService locationService = new LocationService(this);
 
         if (locationService.isLocationAvailable()) {
@@ -57,13 +59,20 @@ public class WeatherActivity extends Activity implements LocationListener {
         return (T) findViewById(id);
     }
 
-    public void setCurWeather(CurrentWeather curWeather) {
+    private void setCurWeather(CurrentWeather curWeather) {
         findById(TextView.class, R.id.cur_temperature).setText(Integer.toString(curWeather.temperature));
         findById(TextView.class, R.id.cur_weather_summary).setText(curWeather.summary);
         findById(TextView.class, R.id.cur_wind_direction).setText(curWeather.windDirection);
 
         String windSpeed = getString(R.string.wind_speed_pattern, curWeather.windSpeed);
         findById(TextView.class, R.id.cur_wind_speed).setText(windSpeed);
+    }
+
+    public void setWeather(CurrentWeather curWeather, List<WeatherItem> items) {
+        setCurWeather(curWeather);
+
+        ListView listView = findById(ListView.class, R.id.weather_items);
+        listView.setAdapter(new WeatherItemsAdapter(this, R.layout.weather_item, items));
     }
 
     public void hideWaitingScreen() {
