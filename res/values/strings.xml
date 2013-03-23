@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">weather</string>
-    <string name="world_weather_service_url">http://free.worldweatheronline.com/feed/weather.ashx?key=%1$s&amp;q=%2$s&amp;num_of_days=5&amp;format=json</string>
+    <string name="world_weather_service_url">
+        http://free.worldweatheronline.com/feed/weather.ashx?key=%1$s&amp;q=%2$s,%3$s&amp;num_of_days=5&amp;format=json
+    </string>
     <string name="location_label_pattern">%1$s, %2$s</string>  <!-- Tuesday, Snow -->
     <string name="temperature_label_pattern">%1$s&#176;C..%2$s&#176;C</string> <!-- 5 C..10 C-->
     <string name="degree_label">&#176;C</string>
     <string name="cur_weather_description">%1$s</string>
     <string name="wind_speed_pattern">%1$s km/h</string>
     <string name="loading_text">Loading...</string>
+    <string name="unexpected_error_message">Occurs unexpected error. Restart of application may help.</string>
+    <string name="critical_error">Critical Error</string>
+    <string name="network_error">Could not connect to internet. Please check your network configuration.</string>
+    <string name="ok">OK</string>
 </resources>

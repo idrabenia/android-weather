@@ -1,4 +1,4 @@
-package idrabenia.weather.ui;
+package idrabenia.weather.ui.weather;
 
 import android.content.Context;
 import android.content.res.Resources;

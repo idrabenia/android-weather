@@ -1,73 +1,67 @@
 package idrabenia.weather.service;
 
 import android.content.Context;
+import android.location.Location;
 import idrabenia.weather.R;
 import idrabenia.weather.domain.weather.CurrentWeather;
 import idrabenia.weather.domain.weather.WeatherItem;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import idrabenia.weather.service.rest.RestClientAction;
+import idrabenia.weather.service.rest.RestClient;
+import org.apache.commons.lang.Validate;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Callable;
 
-import static idrabenia.weather.service.ExceptionHandlingTemplate.executeWithExceptionHandler;
+import static idrabenia.weather.service.ExceptionHandlingTemplate.withExceptionWrapper;
 
 /**
  * @author Ilya Drabenia
  */
-public class WorldWeatherService {
+public class WorldWeatherClient {
     public static final String ACCESS_KEY = "b387f72545173141131603";
 
     private final Context context;
 
-    public WorldWeatherService(Context contextValue) {
+    public WorldWeatherClient(Context contextValue) {
         context = contextValue;
     }
 
-    public String queryWeatherInfo(final String location) {
-        if (location == null || location.length() == 0) {
-            throw new IllegalArgumentException("location == null || location.length() == 0");
-        }
+    /**
+     * Query weather info for specified place
+     * @param location location of place weather for which will be queried
+     * @throws idrabenia.weather.service.rest.NetworkException
+     * @throws idrabenia.weather.service.rest.ParseResponseException
+     * @return string contains requested json
+     */
+    public String queryWeatherInfo(Location location) {
+        Validate.notNull(location);
 
-        return executeWithExceptionHandler(new ExceptionHandlingTemplate.Action<String>() {
+        double latitude = location.getLatitude();
+        double longitude = location.getLongitude();
+        final String url = context.getString(R.string.world_weather_service_url, ACCESS_KEY, latitude, longitude);
+
+        return RestClient.withClient(new RestClientAction() {
             @Override
-            public String execute() throws Exception {
-                HttpClient httpClient = new DefaultHttpClient();
-                HttpGet getWeatherRequest = new HttpGet(context.getString(R.string.world_weather_service_url,
-                        ACCESS_KEY, location));
-
-                HttpResponse response = httpClient.execute(getWeatherRequest);
-
-                BufferedReader responseReader = new BufferedReader(new InputStreamReader(response.getEntity()
-                        .getContent(), "UTF-8"));
-
-                StringBuilder builder = new StringBuilder();
-                String curLine;
-                while ((curLine = responseReader.readLine()) != null) {
-                    builder.append(curLine);
-                }
-
-                return builder.toString();
+            public String call(RestClient client) {
+                return client.getJson(url);
             }
         });
     }
 
     public CurrentWeather parseCurrentWeather(final String jsonString) {
-        return executeWithExceptionHandler(new ExceptionHandlingTemplate.Action<CurrentWeather>() {
+        return withExceptionWrapper(new Callable<CurrentWeather>() {
             @Override
-            public CurrentWeather execute() throws Exception {
+            public CurrentWeather call() throws Exception {
                 CurrentWeather weather = new CurrentWeather();
                 JSONObject json = new JSONObject(jsonString);
 
-                JSONObject curConditions = json.getJSONObject("data").getJSONArray("current_condition").getJSONObject(0);
+                JSONObject curConditions = json.getJSONObject("data").getJSONArray("current_condition")
+                        .getJSONObject(0);
                 weather.temperature = Integer.parseInt(curConditions.getString("temp_C"));
                 weather.windDirection = curConditions.getString("winddir16Point");
                 weather.windSpeed = Integer.parseInt(curConditions.getString("windspeedKmph"));
@@ -78,12 +72,10 @@ public class WorldWeatherService {
     }
 
     public List<WeatherItem> parseWeatherItemList(final String jsonString) {
-        return executeWithExceptionHandler(new ExceptionHandlingTemplate.Action<List<WeatherItem>>() {
+        return withExceptionWrapper(new Callable<List<WeatherItem>>() {
             @Override
-            public List<WeatherItem> execute() throws Exception {
+            public List<WeatherItem> call() throws Exception {
                 List<WeatherItem> items = new ArrayList<WeatherItem>();
-
-                //items.add(parseCurrentWeather(jsonString));
 
                 JSONArray itemJson = new JSONObject(jsonString).getJSONObject("data").getJSONArray("weather");
                 for (int i = 0; i < itemJson.length(); i += 1) {
@@ -96,9 +88,9 @@ public class WorldWeatherService {
     }
 
     private WeatherItem parseWeatherItem(final JSONObject curItemJson) {
-        return executeWithExceptionHandler(new ExceptionHandlingTemplate.Action<WeatherItem>() {
+        return withExceptionWrapper(new Callable<WeatherItem>() {
             @Override
-            public WeatherItem execute() throws Exception {
+            public WeatherItem call() throws Exception {
                 WeatherItem curItem = new WeatherItem();
 
                 curItem.maxTemperature = Integer.parseInt(curItemJson.getString("tempMaxC"));
@@ -112,6 +104,5 @@ public class WorldWeatherService {
             }
         });
     }
-
 
 }
