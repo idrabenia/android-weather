@@ -56,5 +56,4 @@ public class WeatherService extends Service {
         return null;
     }
 
-
 }
