@@ -3,6 +3,7 @@ package idrabenia.weather.ui.weather;
 import android.app.Activity;
 import android.content.Intent;
 import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.animation.Animation;

@@ -17,6 +17,15 @@
             </intent-filter>
         </activity>
         <activity android:name=".ui.CrashDialogActivity" android:theme="@android:style/Theme.Black.NoTitleBar"
-                  android:process=":report_process"/>
+                  android:process=":report_process" />
+
+        <receiver android:name=".ui.weather.WeatherGadgetProvider" android:label="Weather Gadget">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+            </intent-filter>
+            <meta-data
+                    android:name="android.appwidget.provider"
+                    android:resource="@xml/weather_gadget" />
+        </receiver>
     </application>
 </manifest>
