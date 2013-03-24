@@ -1,4 +1,4 @@
-package idrabenia.weather.ui.weather.update;
+package idrabenia.weather.ui.activity.update;
 
 import idrabenia.weather.service.rest.NetworkException;
 

@@ -1,4 +1,4 @@
-package idrabenia.weather.ui.weather;
+package idrabenia.weather.ui.gadget;
 
 import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
@@ -14,6 +14,7 @@ import idrabenia.weather.service.ExceptionHandlingTemplate;
 import idrabenia.weather.service.WorldWeatherClient;
 import idrabenia.weather.service.location.LocationListener;
 import idrabenia.weather.service.location.LocationService;
+import idrabenia.weather.ui.activity.WeatherActivity;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.CountDownLatch;

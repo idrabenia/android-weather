@@ -3,23 +3,35 @@
           package="idrabenia.weather"
           android:versionCode="1"
           android:versionName="1.0">
-    <uses-sdk android:minSdkVersion="14"/>
+    <uses-sdk android:minSdkVersion="14" android:targetSdkVersion="14" />
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
     <application android:label="@string/app_name" android:icon="@drawable/ic_launcher" >
-        <activity android:name=".ui.weather.WeatherActivity" android:theme="@android:style/Theme.Black.NoTitleBar"
+
+
+        <!-- ==================== Weather Activity configuration ===================== -->
+
+        <activity android:name=".ui.activity.WeatherActivity" android:theme="@android:style/Theme.Black.NoTitleBar"
                   android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
-        <activity android:name=".ui.CrashDialogActivity" android:theme="@android:style/Theme.Black.NoTitleBar"
+
+        <activity android:name=".ui.activity.CrashDialogActivity" android:theme="@android:style/Theme.Black.NoTitleBar"
                   android:process=":report_process" />
 
-        <receiver android:name=".ui.weather.WeatherGadgetProvider" android:label="Weather Gadget">
+        <!-- ====================================================================== -->
+
+
+
+        <!-- ==================== Weather Gadget configuration ===================== -->
+
+        <receiver android:name=".ui.gadget.WeatherGadgetProvider" android:label="Weather Gadget">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
@@ -27,5 +39,24 @@
                     android:name="android.appwidget.provider"
                     android:resource="@xml/weather_gadget" />
         </receiver>
+
+        <!-- ======================================================================= -->
+
+
+
+        <!-- =================== Weather Service configuration ===================== -->
+
+        <receiver android:name=".ui.service.BootListener">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+
+        <service android:name=".ui.service.WeatherService" />
+
+        <!-- ====================================================================== -->
+
+
     </application>
+
 </manifest>

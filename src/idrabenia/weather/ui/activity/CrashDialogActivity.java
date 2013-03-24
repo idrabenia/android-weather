@@ -1,7 +1,6 @@
-package idrabenia.weather.ui;
+package idrabenia.weather.ui.activity;
 
 import android.app.Activity;
-import android.app.ActivityManager;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -9,7 +8,6 @@ import android.os.*;
 import android.util.Log;
 import idrabenia.weather.R;
 import idrabenia.weather.service.ExceptionHandlingTemplate;
-import idrabenia.weather.ui.weather.WeatherActivity;
 
 import java.util.concurrent.Callable;
 

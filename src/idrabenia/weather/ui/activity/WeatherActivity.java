@@ -1,9 +1,8 @@
-package idrabenia.weather.ui.weather;
+package idrabenia.weather.ui.activity;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.location.Location;
-import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.view.animation.Animation;
@@ -13,10 +12,10 @@ import android.widget.TextView;
 import idrabenia.weather.R;
 import idrabenia.weather.domain.weather.CurrentWeather;
 import idrabenia.weather.domain.weather.WeatherItem;
+import idrabenia.weather.ui.service.WeatherService;
 import idrabenia.weather.service.location.LocationListener;
 import idrabenia.weather.service.location.LocationService;
-import idrabenia.weather.ui.CrashDialogActivity;
-import idrabenia.weather.ui.weather.update.UpdateWeatherTask;
+import idrabenia.weather.ui.activity.update.UpdateWeatherTask;
 
 import java.util.List;
 
@@ -28,6 +27,7 @@ public class WeatherActivity extends Activity implements LocationListener {
 
         Thread.setDefaultUncaughtExceptionHandler(CrashDialogActivity.buildExceptionHandler(this));
 
+        startService(new Intent(this, WeatherService.class));
         setContentView(R.layout.waiting_screen);
         refreshWeatherInfo();
     }

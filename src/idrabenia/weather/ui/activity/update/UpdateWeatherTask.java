@@ -1,16 +1,14 @@
-package idrabenia.weather.ui.weather.update;
+package idrabenia.weather.ui.activity.update;
 
 import android.location.Location;
 import android.os.AsyncTask;
-import android.widget.ListView;
 import idrabenia.weather.R;
 import idrabenia.weather.domain.weather.CurrentWeather;
 import idrabenia.weather.domain.weather.WeatherItem;
 import idrabenia.weather.service.WorldWeatherClient;
 import idrabenia.weather.service.rest.NetworkException;
-import idrabenia.weather.ui.CrashDialogActivity;
-import idrabenia.weather.ui.weather.WeatherActivity;
-import idrabenia.weather.ui.weather.WeatherItemsAdapter;
+import idrabenia.weather.ui.activity.CrashDialogActivity;
+import idrabenia.weather.ui.activity.WeatherActivity;
 
 import java.util.List;
 import java.util.Timer;
