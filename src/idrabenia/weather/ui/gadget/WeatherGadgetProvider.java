@@ -6,18 +6,16 @@ import android.appwidget.AppWidgetProvider;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.widget.RemoteViews;
 import idrabenia.weather.R;
 import idrabenia.weather.domain.weather.CurrentWeather;
-import idrabenia.weather.service.ExceptionHandlingTemplate;
 import idrabenia.weather.service.WorldWeatherClient;
 import idrabenia.weather.service.location.LocationListener;
 import idrabenia.weather.service.location.LocationService;
-import idrabenia.weather.ui.activity.WeatherActivity;
+import idrabenia.weather.ui.activity.weather.WeatherActivity;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.CountDownLatch;
 
 /**
  * @author Ilya Drabenia
@@ -33,34 +31,19 @@ public class WeatherGadgetProvider extends AppWidgetProvider {
         for (int widgetId : allWidgetIds) {
             final RemoteViews remoteViews = new RemoteViews(context.getPackageName(), R.layout.weather_gadget);
 
-            final CountDownLatch waitUpdateLatch = new CountDownLatch(1);
-            new LocationService(context).getCurrentLocationAsync(new LocationListener() {
-                @Override
-                public void onLocationReceived(Location location) {
-                    WorldWeatherClient weatherProvider = new WorldWeatherClient(context);
-                    String info = weatherProvider.queryWeatherInfo(location);
+            SharedPreferences preferences = context.getSharedPreferences("weather.cache", Context.MODE_PRIVATE);
+            String info = preferences.getString("weather_json", "");
 
-                    CurrentWeather curWeather = weatherProvider.parseCurrentWeather(info);
+            WorldWeatherClient weatherProvider = new WorldWeatherClient(context);
+            CurrentWeather curWeather = weatherProvider.parseCurrentWeather(info);
 
-                    // Set the text
-                    remoteViews.setTextViewText(R.id.cur_temperature, Integer.toString(curWeather.temperature));
-                    //Integer.toString(curWeather.temperature));
-                    remoteViews.setTextViewText(R.id.cur_weather_summary, curWeather.summary);
-                    remoteViews.setTextViewText(R.id.cur_wind_direction, curWeather.windDirection);
+            // Set the text
+            remoteViews.setTextViewText(R.id.cur_temperature, Integer.toString(curWeather.temperature));
+            remoteViews.setTextViewText(R.id.cur_weather_summary, curWeather.summary);
+            remoteViews.setTextViewText(R.id.cur_wind_direction, curWeather.windDirection);
 
-                    String windSpeed = context.getString(R.string.wind_speed_pattern, curWeather.windSpeed);
-                    remoteViews.setTextViewText(R.id.cur_wind_speed, windSpeed);
-
-                    waitUpdateLatch.countDown();
-                }
-            });
-            ExceptionHandlingTemplate.ignoreExceptions(new Callable<Object>() {
-                @Override
-                public Object call() throws Exception {
-                    waitUpdateLatch.await();
-                    return null;
-                }
-            });
+            String windSpeed = context.getString(R.string.wind_speed_pattern, curWeather.windSpeed);
+            remoteViews.setTextViewText(R.id.cur_wind_speed, windSpeed);
 
             // Register an onClickListener
             Intent intent = new Intent(context, WeatherActivity.class);
@@ -69,5 +52,16 @@ public class WeatherGadgetProvider extends AppWidgetProvider {
 
             appWidgetManager.updateAppWidget(widgetId, remoteViews);
         }
+
+        new LocationService(context).getCurrentLocationAsync(new LocationListener() {
+            @Override
+            public void onLocationReceived(Location location) {
+                WorldWeatherClient weatherProvider = new WorldWeatherClient(context);
+                String info = weatherProvider.queryWeatherInfo(location);
+
+                context.getSharedPreferences("weather.cache", Context.MODE_PRIVATE).edit()
+                        .putString("weather_json", info).commit();
+            }
+        });
     }
 }

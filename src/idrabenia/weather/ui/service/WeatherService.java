@@ -1,9 +1,14 @@
 package idrabenia.weather.ui.service;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.os.IBinder;
 import android.util.Log;
+import idrabenia.weather.service.WorldWeatherClient;
+import idrabenia.weather.service.location.LocationListener;
+import idrabenia.weather.service.location.LocationService;
 
 import java.util.Timer;
 import java.util.TimerTask;
@@ -16,10 +21,21 @@ public class WeatherService extends Service {
 
     @Override
     public void onCreate() {
+        final Context context = getApplicationContext();
         new Timer().schedule(new TimerTask() {
             @Override
             public void run() {
-                Log.w("WeatherService", "YEEEEEP! Weather service started!");
+                new LocationService(context).getCurrentLocationAsync(new LocationListener() {
+                    @Override
+                    public void onLocationReceived(Location location) {
+                        WorldWeatherClient weatherProvider = new WorldWeatherClient(context);
+                        String response = weatherProvider.queryWeatherInfo(location);
+
+                        // cache cur weather
+                        context.getSharedPreferences("weather.cache", Context.MODE_PRIVATE).edit()
+                                .putString("weather_json", response).commit();
+                    }
+                });
             }
         }, 1000, 1000);
 

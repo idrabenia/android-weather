@@ -1,0 +1,14 @@
+<resources>
+    <string-array name="update_frequencies">
+        <item>15 minutes</item>
+        <item>30 minutes</item>
+        <item>1 hour</item>
+        <item>2 hour</item>
+    </string-array>
+    <string-array name="update_frequency_values">
+        <item>900000</item>
+        <item>1800000</item>
+        <item>3600000</item>
+        <item>7200000</item>
+    </string-array>
+</resources>

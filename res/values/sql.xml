@@ -1,0 +1,27 @@
+<resources>
+    <string-array name="weather_db_ddl">
+        <item>
+            create table cur_weather (
+                id integer primary key autoincrement,
+                temperature integer not null,
+                wind_speed integer not null,
+                wind_direction text not null,
+                summary text not null
+            );
+        </item>
+        <item>
+            create table weather_item (
+                id integer primary key autoincrement,
+                date text unique,
+                min_temperature integer not null,
+                max_temperature integer not null,
+                image_url text not null,
+                description text not null
+            );
+        </item>
+        <item>
+            insert into weather_item (date, min_temperature, max_temperature, image_url, description)
+            values (\'2012-4-8\', -10, -5, \'http://google.com\', \'Very Bad Weather\');
+        </item>
+    </string-array>
+</resources>

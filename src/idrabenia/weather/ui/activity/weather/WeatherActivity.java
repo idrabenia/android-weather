@@ -1,9 +1,11 @@
-package idrabenia.weather.ui.activity;
+package idrabenia.weather.ui.activity.weather;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.location.Location;
 import android.os.Bundle;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -12,10 +14,11 @@ import android.widget.TextView;
 import idrabenia.weather.R;
 import idrabenia.weather.domain.weather.CurrentWeather;
 import idrabenia.weather.domain.weather.WeatherItem;
-import idrabenia.weather.ui.service.WeatherService;
 import idrabenia.weather.service.location.LocationListener;
 import idrabenia.weather.service.location.LocationService;
-import idrabenia.weather.ui.activity.update.UpdateWeatherTask;
+import idrabenia.weather.ui.activity.CrashDialogActivity;
+import idrabenia.weather.ui.activity.SettingsActivity;
+import idrabenia.weather.ui.activity.weather.update.UpdateWeatherTask;
 
 import java.util.List;
 
@@ -27,9 +30,25 @@ public class WeatherActivity extends Activity implements LocationListener {
 
         Thread.setDefaultUncaughtExceptionHandler(CrashDialogActivity.buildExceptionHandler(this));
 
-        startService(new Intent(this, WeatherService.class));
+        //startService(new Intent(this, WeatherService.class));
         setContentView(R.layout.waiting_screen);
+
+//        SQLiteDatabase db = new WeatherDbHelper((Context) this).getWritableDatabase();
         refreshWeatherInfo();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.weather_screen, menu);
+        menu.findItem(R.id.menu_settings).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                startActivity(new Intent(WeatherActivity.this, SettingsActivity.class));
+                return true;
+            }
+        });
+
+        return true;
     }
 
     public void refreshWeatherInfo() {
@@ -78,7 +97,7 @@ public class WeatherActivity extends Activity implements LocationListener {
 
     public void hideWaitingScreen() {
         if (findViewById(R.id.waiting_screen) != null) {
-            setContentView(R.layout.main);
+            setContentView(R.layout.weather_screen);
 
             View imageView = findById(View.class, R.id.main_root_view);
             Animation fadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.main_layout_starting);

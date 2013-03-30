@@ -1,14 +1,16 @@
-package idrabenia.weather.ui.activity.update;
+package idrabenia.weather.ui.activity.weather.update;
 
+import android.content.Context;
 import android.location.Location;
 import android.os.AsyncTask;
+import android.preference.PreferenceManager;
 import idrabenia.weather.R;
 import idrabenia.weather.domain.weather.CurrentWeather;
 import idrabenia.weather.domain.weather.WeatherItem;
 import idrabenia.weather.service.WorldWeatherClient;
 import idrabenia.weather.service.rest.NetworkException;
 import idrabenia.weather.ui.activity.CrashDialogActivity;
-import idrabenia.weather.ui.activity.WeatherActivity;
+import idrabenia.weather.ui.activity.weather.WeatherActivity;
 
 import java.util.List;
 import java.util.Timer;
@@ -50,6 +52,10 @@ public class UpdateWeatherTask extends AsyncTask<Location, Integer, UpdateResult
             List<WeatherItem> items = weatherClient.parseWeatherItemList(result.response);
             activity.setWeather(curWeather, items);
 
+            // cache cur weather
+            activity.getSharedPreferences("weather.cache", Context.MODE_PRIVATE).edit()
+                    .putString("weather_json", result.response).commit();
+
             scheduleRefreshWeatherTask();
         }
 
@@ -59,12 +65,15 @@ public class UpdateWeatherTask extends AsyncTask<Location, Integer, UpdateResult
     }
 
     private void scheduleRefreshWeatherTask() {
+        String updateInterval = PreferenceManager.getDefaultSharedPreferences(activity)
+                .getString("update_interval", activity.getString(R.string.update_weather_delay));
+
         new Timer("Update Weather Timer", true).schedule(new TimerTask() {
             @Override
             public void run() {
                 activity.refreshWeatherInfo();
             }
-        }, activity.getResources().getInteger(R.integer.update_weather_delay));
+        }, Integer.parseInt(updateInterval));
     }
 
 }
