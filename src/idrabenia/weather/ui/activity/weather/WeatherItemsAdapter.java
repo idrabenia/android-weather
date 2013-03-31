@@ -36,11 +36,28 @@ public class WeatherItemsAdapter extends ArrayAdapter<WeatherItem> {
 
         WeatherItem curItem = this.getItem(position);
         if (curItem != null) {
-            setWeatherImage(v, curItem.imageUrl.replaceAll(".*\\/", "").replaceAll("\\..*", ""));
+            setWeatherImage(v, parseImageName(curItem.imageUrl));
             setTemperature(v, curItem.minTemperature, curItem.maxTemperature);
             setItemTitle(v, curItem.date, curItem.description);
         }
+
         return v;
+    }
+
+    private String parseImageName(String url) {
+        return url.replaceAll(".*\\/", "").replaceAll("\\..*", "");
+    }
+
+    private ImageView getWeatherImage(View v) {
+        return (ImageView) v.findViewById(R.id.current_weather_image);
+    }
+
+    private void setWeatherImage(View v, String imageName) {
+        Resources resources = getContext().getResources();
+        int imageId = resources.getIdentifier(imageName, "drawable", this.getContext().getPackageName());
+
+        getWeatherImage(v).setImageBitmap(getResizedBitmap(BitmapFactory.decodeResource(resources,
+                imageId), 140, 140));
     }
 
     public Bitmap getResizedBitmap(Bitmap bm, int newHeight, int newWidth) {
@@ -61,31 +78,19 @@ public class WeatherItemsAdapter extends ArrayAdapter<WeatherItem> {
         return resizedBitmap;
     }
 
-    ImageView getWeatherImage(View v) {
-        return (ImageView) v.findViewById(R.id.current_weather_image);
-    }
-
-    void setWeatherImage(View v, String imageName) {
-        Resources resources = getContext().getResources();
-        int imageId = resources.getIdentifier(imageName, "drawable", this.getContext().getPackageName());
-
-        getWeatherImage(v).setImageBitmap(getResizedBitmap(BitmapFactory.decodeResource(resources,
-                imageId), 140, 140));
-    }
-
-    TextView getItemTitleLabel(View v) {
+    private TextView getTitleLabel(View v) {
         return (TextView) v.findViewById(R.id.item_title_label);
     }
 
-    void setItemTitle(View v, String date, String description) {
-        getItemTitleLabel(v).setText(getContext().getString(R.string.location_label_pattern, date, description));
+    private void setItemTitle(View v, String date, String description) {
+        getTitleLabel(v).setText(getContext().getString(R.string.location_label_pattern, date, description));
     }
 
-    TextView getTemperatureLabel(View v) {
+    private TextView getTemperatureLabel(View v) {
         return (TextView) v.findViewById(R.id.temperature_label);
     }
 
-    void setTemperature(View v, int minTemperature, int maxTemperature) {
+    private void setTemperature(View v, int minTemperature, int maxTemperature) {
         String labelText = getContext().getString(R.string.temperature_label_pattern, minTemperature, maxTemperature);
         getTemperatureLabel(v).setText(labelText);
     }

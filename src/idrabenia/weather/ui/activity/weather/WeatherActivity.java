@@ -16,6 +16,7 @@ import idrabenia.weather.domain.weather.CurrentWeather;
 import idrabenia.weather.domain.weather.WeatherItem;
 import idrabenia.weather.service.location.LocationListener;
 import idrabenia.weather.service.location.LocationService;
+import idrabenia.weather.ui.activity.AnimationListenerSkeleton;
 import idrabenia.weather.ui.activity.CrashDialogActivity;
 import idrabenia.weather.ui.activity.SettingsActivity;
 import idrabenia.weather.ui.activity.weather.update.ScheduledUpdateWeatherTask;
@@ -41,7 +42,7 @@ public class WeatherActivity extends Activity {
         Thread.setDefaultUncaughtExceptionHandler(CrashDialogActivity.buildExceptionHandler(this));
 
         setContentView(R.layout.waiting_screen);
-        refreshWeatherInfo(new ScheduledUpdateWeatherTask(this));
+        startUpdateWeatherTask(new ScheduledUpdateWeatherTask(this));
     }
 
     @Override
@@ -50,7 +51,7 @@ public class WeatherActivity extends Activity {
         menu.findItem(R.id.menu_settings).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                return startSettingsActivity();
+                return showSettings();
             }
         });
 
@@ -64,38 +65,31 @@ public class WeatherActivity extends Activity {
         return true;
     }
 
-    private boolean startSettingsActivity() {
+    private boolean showSettings() {
         startActivity(new Intent(WeatherActivity.this, SettingsActivity.class));
         return true;
     }
 
     private boolean refresh() {
-        if (isWaitingBackgroundTask()) {
-            return true;
+        if (!isWaitingBackgroundTask()) {
+            setWaitingBackgroundTask(true);
+
+            Animation animation = AnimationUtils.loadAnimation(WeatherActivity.this, R.anim.hide_weather_screen);
+            animation.setAnimationListener(new AnimationListenerSkeleton() {
+                @Override
+                public void onAnimationEnd(Animation animation) {
+                    setContentView(R.layout.waiting_screen);
+                    startUpdateWeatherTask(new UpdateWeatherTask(WeatherActivity.this));
+                }
+            });
+            findById(View.class, R.id.main_root_view).startAnimation(animation);
         }
-        isWaitingBackgroundTask = true;
-
-        View imageView = findById(View.class, R.id.main_root_view);
-        Animation fadeInAnimation = AnimationUtils.loadAnimation(WeatherActivity.this, R.anim.waiting_screen_starting);
-        fadeInAnimation.setAnimationListener(new Animation.AnimationListener() {
-            @Override
-            public void onAnimationStart(Animation animation) { }
-
-            @Override
-            public void onAnimationEnd(Animation animation) {
-                setContentView(R.layout.waiting_screen);
-                refreshWeatherInfo(new UpdateWeatherTask(WeatherActivity.this));
-            }
-
-            @Override
-            public void onAnimationRepeat(Animation animation) { }
-        });
-        imageView.startAnimation(fadeInAnimation);
 
         return true;
     }
 
-    public void refreshWeatherInfo(final UpdateWeatherTask updateWeatherTask) {
+    public void startUpdateWeatherTask(final UpdateWeatherTask updateWeatherTask) {
+        setWaitingBackgroundTask(true);
         LocationService locationService = new LocationService(this);
 
         if (locationService.isLocationAvailable()) {
@@ -115,7 +109,7 @@ public class WeatherActivity extends Activity {
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        refreshWeatherInfo(new ScheduledUpdateWeatherTask(this));
+        startUpdateWeatherTask(new ScheduledUpdateWeatherTask(this));
     }
 
     @SuppressWarnings("unchecked")
@@ -143,9 +137,8 @@ public class WeatherActivity extends Activity {
         if (isWaitingScreenShown()) {
             setContentView(R.layout.weather_screen);
 
-            View imageView = findById(View.class, R.id.main_root_view);
-            Animation fadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.weather_layout_starting);
-            imageView.startAnimation(fadeInAnimation);
+            Animation fadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.show_weather_screen);
+            findById(View.class, R.id.main_root_view).startAnimation(fadeInAnimation);
         }
     }
 

@@ -34,7 +34,7 @@ public class ScheduledUpdateWeatherTask extends UpdateWeatherTask {
         TimerHolder.timer.schedule(new TimerTask() {
             @Override
             public void run() {
-                activity.refreshWeatherInfo(new ScheduledUpdateWeatherTask(activity));
+                activity.startUpdateWeatherTask(new ScheduledUpdateWeatherTask(activity));
             }
         }, Integer.parseInt(updateInterval));
     }
