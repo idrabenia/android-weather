@@ -18,11 +18,21 @@ import idrabenia.weather.service.location.LocationListener;
 import idrabenia.weather.service.location.LocationService;
 import idrabenia.weather.ui.activity.CrashDialogActivity;
 import idrabenia.weather.ui.activity.SettingsActivity;
+import idrabenia.weather.ui.activity.weather.update.ScheduledUpdateWeatherTask;
 import idrabenia.weather.ui.activity.weather.update.UpdateWeatherTask;
 
 import java.util.List;
 
-public class WeatherActivity extends Activity implements LocationListener {
+public class WeatherActivity extends Activity {
+    private boolean isWaitingBackgroundTask = false;
+
+    public boolean isWaitingBackgroundTask() {
+        return isWaitingBackgroundTask;
+    }
+
+    public void setWaitingBackgroundTask(boolean waitingBackgroundTask) {
+        isWaitingBackgroundTask = waitingBackgroundTask;
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -30,11 +40,8 @@ public class WeatherActivity extends Activity implements LocationListener {
 
         Thread.setDefaultUncaughtExceptionHandler(CrashDialogActivity.buildExceptionHandler(this));
 
-        //startService(new Intent(this, WeatherService.class));
         setContentView(R.layout.waiting_screen);
-
-//        SQLiteDatabase db = new WeatherDbHelper((Context) this).getWritableDatabase();
-        refreshWeatherInfo();
+        refreshWeatherInfo(new ScheduledUpdateWeatherTask(this));
     }
 
     @Override
@@ -43,27 +50,64 @@ public class WeatherActivity extends Activity implements LocationListener {
         menu.findItem(R.id.menu_settings).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem item) {
-                startActivity(new Intent(WeatherActivity.this, SettingsActivity.class));
-                return true;
+                return startSettingsActivity();
+            }
+        });
+
+        menu.findItem(R.id.menu_refresh).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                return refresh();
             }
         });
 
         return true;
     }
 
-    public void refreshWeatherInfo() {
+    private boolean startSettingsActivity() {
+        startActivity(new Intent(WeatherActivity.this, SettingsActivity.class));
+        return true;
+    }
+
+    private boolean refresh() {
+        if (isWaitingBackgroundTask()) {
+            return true;
+        }
+        isWaitingBackgroundTask = true;
+
+        View imageView = findById(View.class, R.id.main_root_view);
+        Animation fadeInAnimation = AnimationUtils.loadAnimation(WeatherActivity.this, R.anim.waiting_screen_starting);
+        fadeInAnimation.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) { }
+
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                setContentView(R.layout.waiting_screen);
+                refreshWeatherInfo(new UpdateWeatherTask(WeatherActivity.this));
+            }
+
+            @Override
+            public void onAnimationRepeat(Animation animation) { }
+        });
+        imageView.startAnimation(fadeInAnimation);
+
+        return true;
+    }
+
+    public void refreshWeatherInfo(final UpdateWeatherTask updateWeatherTask) {
         LocationService locationService = new LocationService(this);
 
         if (locationService.isLocationAvailable()) {
-            locationService.getCurrentLocationAsync(this);
+            locationService.getCurrentLocationAsync(new LocationListener() {
+                @Override
+                public void onLocationReceived(Location location) {
+                    updateWeatherTask.execute(location);
+                }
+            });
         } else {
             startActivityForResult(new Intent(android.provider.Settings.ACTION_LOCATION_SOURCE_SETTINGS), 0);
         }
-    }
-
-    @Override
-    public void onLocationReceived(Location location) {
-        new UpdateWeatherTask(this).execute(location);
     }
 
     /**
@@ -71,7 +115,7 @@ public class WeatherActivity extends Activity implements LocationListener {
      */
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        refreshWeatherInfo();
+        refreshWeatherInfo(new ScheduledUpdateWeatherTask(this));
     }
 
     @SuppressWarnings("unchecked")
@@ -96,13 +140,17 @@ public class WeatherActivity extends Activity implements LocationListener {
     }
 
     public void hideWaitingScreen() {
-        if (findViewById(R.id.waiting_screen) != null) {
+        if (isWaitingScreenShown()) {
             setContentView(R.layout.weather_screen);
 
             View imageView = findById(View.class, R.id.main_root_view);
-            Animation fadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.main_layout_starting);
+            Animation fadeInAnimation = AnimationUtils.loadAnimation(this, R.anim.weather_layout_starting);
             imageView.startAnimation(fadeInAnimation);
         }
+    }
+
+    private boolean isWaitingScreenShown() {
+        return findViewById(R.id.waiting_screen) != null;
     }
 
 }
