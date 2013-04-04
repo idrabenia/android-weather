@@ -3,7 +3,6 @@ package idrabenia.weather.ui.service;
 import android.content.Context;
 import android.location.Location;
 import android.preference.PreferenceManager;
-import android.util.Log;
 import idrabenia.weather.R;
 import idrabenia.weather.service.ExceptionHandlingTemplate;
 import idrabenia.weather.service.WorldWeatherClient;

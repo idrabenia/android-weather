@@ -7,13 +7,10 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.location.Location;
 import android.widget.RemoteViews;
 import idrabenia.weather.R;
 import idrabenia.weather.domain.weather.CurrentWeather;
 import idrabenia.weather.service.WorldWeatherClient;
-import idrabenia.weather.service.location.LocationListener;
-import idrabenia.weather.service.location.LocationService;
 import idrabenia.weather.ui.activity.weather.WeatherActivity;
 import idrabenia.weather.ui.service.WeatherService;
 

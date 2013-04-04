@@ -5,7 +5,6 @@ import android.util.Log;
 import idrabenia.weather.R;
 import idrabenia.weather.domain.weather.CurrentWeather;
 import idrabenia.weather.domain.weather.WeatherItem;
-import idrabenia.weather.service.TimerHolder;
 import idrabenia.weather.ui.activity.weather.WeatherActivity;
 
 import java.util.List;

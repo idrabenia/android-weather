@@ -3,11 +3,6 @@ package idrabenia.weather.ui.service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
-import idrabenia.weather.ui.service.WeatherService;
-
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * @author Ilya Drabenia

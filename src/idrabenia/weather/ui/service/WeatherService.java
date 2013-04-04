@@ -1,21 +1,11 @@
 package idrabenia.weather.ui.service;
 
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.IBinder;
-import idrabenia.weather.R;
-import idrabenia.weather.domain.weather.CurrentWeather;
-import idrabenia.weather.domain.weather.WeatherItem;
-import idrabenia.weather.service.WorldWeatherClient;
 
-import java.util.List;
 import java.util.Timer;
-import java.util.TimerTask;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Ilya Drabenia
