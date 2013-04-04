@@ -15,6 +15,7 @@ import idrabenia.weather.service.WorldWeatherClient;
 import idrabenia.weather.service.location.LocationListener;
 import idrabenia.weather.service.location.LocationService;
 import idrabenia.weather.ui.activity.weather.WeatherActivity;
+import idrabenia.weather.ui.service.WeatherService;
 
 
 /**
@@ -25,6 +26,8 @@ public class WeatherGadgetProvider extends AppWidgetProvider {
 
     @Override
     public void onUpdate(final Context context, AppWidgetManager appWidgetManager, int[] appWidgetIds) {
+        WeatherService.start(context);
+
         // Get all ids
         ComponentName thisWidget = new ComponentName(context, WeatherGadgetProvider.class);
         int[] allWidgetIds = appWidgetManager.getAppWidgetIds(thisWidget);
@@ -52,16 +55,5 @@ public class WeatherGadgetProvider extends AppWidgetProvider {
 
             appWidgetManager.updateAppWidget(widgetId, remoteViews);
         }
-
-        new LocationService(context).getCurrentLocationAsync(new LocationListener() {
-            @Override
-            public void onLocationReceived(Location location) {
-                WorldWeatherClient weatherProvider = new WorldWeatherClient(context);
-                String info = weatherProvider.queryWeatherInfo(location);
-
-                context.getSharedPreferences("weather.cache", Context.MODE_PRIVATE).edit()
-                        .putString("weather_json", info).commit();
-            }
-        });
     }
 }

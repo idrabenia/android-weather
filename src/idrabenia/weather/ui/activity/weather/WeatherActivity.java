@@ -21,11 +21,14 @@ import idrabenia.weather.ui.activity.CrashDialogActivity;
 import idrabenia.weather.ui.activity.SettingsActivity;
 import idrabenia.weather.ui.activity.weather.update.ScheduledUpdateWeatherTask;
 import idrabenia.weather.ui.activity.weather.update.UpdateWeatherTask;
+import idrabenia.weather.ui.service.WeatherService;
 
 import java.util.List;
+import java.util.Timer;
 
 public class WeatherActivity extends Activity {
     private boolean isWaitingBackgroundTask = false;
+    public final Timer TIMER = new Timer("Weather Activity Timer");
 
     public boolean isWaitingBackgroundTask() {
         return isWaitingBackgroundTask;
@@ -38,6 +41,7 @@ public class WeatherActivity extends Activity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        WeatherService.start(this);
 
         Thread.setDefaultUncaughtExceptionHandler(CrashDialogActivity.buildExceptionHandler(this));
 
@@ -146,4 +150,9 @@ public class WeatherActivity extends Activity {
         return findViewById(R.id.waiting_screen) != null;
     }
 
+    @Override
+    protected void onDestroy() {
+        TIMER.cancel();
+        super.onDestroy();
+    }
 }

@@ -23,8 +23,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.activity.CrashDialogActivity" android:theme="@android:style/Theme.Black.NoTitleBar"
-                  android:process=":report_process" />
+        <activity android:name=".ui.activity.CrashDialogActivity"
+                  android:theme="@android:style/Theme.Black.NoTitleBar" />
 
         <activity android:name=".ui.activity.SettingsActivity" />
 

@@ -1,75 +1,52 @@
 package idrabenia.weather.ui.service;
 
+import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
-import android.location.Location;
+import android.content.SharedPreferences;
 import android.os.IBinder;
-import android.util.Log;
+import idrabenia.weather.R;
+import idrabenia.weather.domain.weather.CurrentWeather;
+import idrabenia.weather.domain.weather.WeatherItem;
 import idrabenia.weather.service.WorldWeatherClient;
-import idrabenia.weather.service.location.LocationListener;
-import idrabenia.weather.service.location.LocationService;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * @author Ilya Drabenia
  * @since 24.03.13
  */
 public class WeatherService extends Service {
+    private final Timer timer = new Timer("Weather Service Timer");
 
     @Override
     public void onCreate() {
-        final Context context = getApplicationContext();
-        new Timer().schedule(new TimerTask() {
-            @Override
-            public void run() {
-                new LocationService(context).getCurrentLocationAsync(new LocationListener() {
-                    @Override
-                    public void onLocationReceived(Location location) {
-                        WorldWeatherClient weatherProvider = new WorldWeatherClient(context);
-                        String response = weatherProvider.queryWeatherInfo(location);
-
-                        // cache cur weather
-                        context.getSharedPreferences("weather.cache", Context.MODE_PRIVATE).edit()
-                                .putString("weather_json", response).commit();
-                    }
-                });
-            }
-        }, 1000, 1000);
+        startUpdateWeatherJob();
+        startWeatherAlertJob();
 
         super.onCreate();
     }
 
-    @Override
-    public void onStart(Intent intent, int startId) {
-        super.onStart(intent, startId);
+    private void startUpdateWeatherJob() {
+        timer.schedule(new RefreshWeatherTask(getApplicationContext(), timer), 0);
     }
 
-    @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        return super.onStartCommand(intent, flags, startId);
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    public boolean onUnbind(Intent intent) {
-        return super.onUnbind(intent);
-    }
-
-    @Override
-    public void onRebind(Intent intent) {
-        super.onRebind(intent);
+    private void startWeatherAlertJob() {
+        timer.schedule(new WeatherAlarmTask(this, timer), 0);
     }
 
     @Override
     public IBinder onBind(Intent intent) {
         return null;
+    }
+
+    public static void start(Context context) {
+        context.startService(new Intent(context, WeatherService.class));
     }
 
 }

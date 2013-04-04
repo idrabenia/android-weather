@@ -1,6 +1,7 @@
 package idrabenia.weather.ui.activity.weather.update;
 
 import android.preference.PreferenceManager;
+import android.util.Log;
 import idrabenia.weather.R;
 import idrabenia.weather.domain.weather.CurrentWeather;
 import idrabenia.weather.domain.weather.WeatherItem;
@@ -31,12 +32,16 @@ public class ScheduledUpdateWeatherTask extends UpdateWeatherTask {
         String updateInterval = PreferenceManager.getDefaultSharedPreferences(activity)
                 .getString("update_interval", activity.getString(R.string.update_weather_delay));
 
-        TimerHolder.timer.schedule(new TimerTask() {
-            @Override
-            public void run() {
-                activity.startUpdateWeatherTask(new ScheduledUpdateWeatherTask(activity));
-            }
-        }, Integer.parseInt(updateInterval));
+        try {
+            activity.TIMER.schedule(new TimerTask() {
+                @Override
+                public void run() {
+                    activity.startUpdateWeatherTask(new ScheduledUpdateWeatherTask(activity));
+                }
+            }, Integer.parseInt(updateInterval));
+        } catch (IllegalStateException ex) {
+            Log.w("Weather", "Could not schedule task on cancelled timer");
+        }
     }
 
 }
