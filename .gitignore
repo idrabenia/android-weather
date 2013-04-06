@@ -12,6 +12,9 @@
 bin/
 gen/
 out/
+proguard_logs/
+screenshots/
+keystore
 
 # Local configuration file (sdk path, etc)
 local.properties
