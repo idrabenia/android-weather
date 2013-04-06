@@ -2,7 +2,7 @@
 <resources>
     <string name="app_name">Weather</string>
     <string name="world_weather_service_url">
-        http://free.worldweatheronline.com/feed/weather.ashx?key=%1$s&amp;q=%2$s,%3$s&amp;num_of_days=5&amp;format=json
+        http://api.worldweatheronline.com/free/v1/weather.ashx?key=%1$s&amp;q=%2$s,%3$s&amp;num_of_days=5&amp;format=json
     </string>
     <string name="location_label_pattern">%1$s, %2$s</string>  <!-- Tuesday, Snow -->
     <string name="temperature_label_pattern">%1$s&#176;C..%2$s&#176;C</string> <!-- 5 C..10 C-->

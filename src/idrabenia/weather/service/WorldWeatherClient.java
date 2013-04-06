@@ -23,7 +23,8 @@ import static idrabenia.weather.service.ExceptionHandlingTemplate.withExceptionW
  * @author Ilya Drabenia
  */
 public class WorldWeatherClient {
-    public static final String ACCESS_KEY = "b387f72545173141131603";
+    public static final String ACCESS_KEY = "pw7xg4hmjxxqtr46z76vt4jt";
+    //"b387f72545173141131603";
 
     private final Context context;
 

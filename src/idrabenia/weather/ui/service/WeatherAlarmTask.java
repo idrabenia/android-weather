@@ -27,10 +27,10 @@ public class WeatherAlarmTask extends TimerTask {
     private final Context context;
     private final Condition[] conditions = new Condition[] {
             new TodayColdCondition(),
-            new TodayWarnCondition(),
+            //new TodayWarnCondition(),
             new TodayWindyCondition(),
             new TomorrowColdCondition(),
-            new TomorrowWarmCondition()
+            //new TomorrowWarmCondition()
     };
     private final AtomicInteger notificationCounter = new AtomicInteger(0);
 

@@ -4,7 +4,8 @@ import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.os.Bundle;
+import android.os.*;
+import android.os.Process;
 import android.util.Log;
 import idrabenia.weather.R;
 import idrabenia.weather.service.ExceptionHandlingTemplate;
@@ -52,6 +53,7 @@ public class CrashDialogActivity extends Activity {
                 } finally {
                     // Try everything to make sure this process goes away.
                     parentActivity.finish();
+                    Process.killProcess(Process.myPid());
                 }
             }
         });
